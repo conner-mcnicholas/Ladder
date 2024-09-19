@@ -83,8 +83,11 @@ for div in range (1,3):
             df_stats['PA']=[dr['P'][x][1] for x in df_stats.PLAYER]
             df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(1)
 
+    if div == 1:
+        df_stats = df_stats[df_stats.PLAYER !='Colin Pollock']
     if div == 2:
-        df_stats = df_stats[df_stats.PLAYER !='Mauricio Cuervo']           
+        df_stats = df_stats[df_stats.PLAYER !='Mauricio Cuervo']
+        df_stats = df_stats[df_stats.PLAYER !='Alessandro Arnulfo']        
     df_stats.sort_values(['WR','PD\''], ascending = [False,False], na_position ='last',inplace=True)
     df_stats['#'] = range(1,len(df_stats)+1)
     df_stats = df_stats[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
