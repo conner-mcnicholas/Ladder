@@ -12,8 +12,8 @@ sh = sa.open("SCALPEL Ladder")
 for div in range (1,3):
     schedule_ws = sh.worksheet(f"D{div} Results")
     schedule = get_as_dataframe(schedule_ws,nrows=100)[['Wk','Player A1', \
-        'Player A2','Player B1','Player B2','Pts A','Pts B']]
-    played = schedule[pd.notna(schedule['Pts A'])]
+        'Player A2','Player B1','Player B2','A','B']]
+    played = schedule[pd.notna(schedule['A'])]
     if len(played) == 0:
             break
     events = int(np.max(played.Wk))
@@ -42,9 +42,9 @@ for div in range (1,3):
             match = played_event.iloc[m]
     
             A1,A2,B1,B2 = match[['Player A1','Player A2','Player B1','Player B2']].str.strip()
-            PA,PB = match[['Pts A','Pts B']]
+            PA,PB = match[['A','B']]
             
-            #print(f'Pts A:{Pts A},Pts B:{Pts B}')
+            #print(f'A:{A},B:{B}')
             if PA > PB:
                 #print(f'{A} beat {B} by score:{PA}-{PB}')
                 dr['M'][A1][0]+=1
