@@ -11,8 +11,8 @@ sh = sa.open("SCALPEL Ladder")
 
 for div in range (1,3):
     schedule_ws = sh.worksheet(f"D{div} Results")
-    schedule = get_as_dataframe(schedule_ws,nrows=100)[['Player A1', \
-        'Player A2','Player B1','Player B2','A','B']]
+    schedule = get_as_dataframe(schedule_ws,nrows=100)[['A1', \
+        'A2','B1','B2','A','B']]
     played = schedule[pd.notna(schedule['A'])]
 
     if len(played) == 0:
@@ -30,15 +30,15 @@ for div in range (1,3):
         for k in ['M','P']:
             dr[k][p]=[0,0]
 
-    allplayers = list(pd.concat([played['Player A1'].str.strip(),played['Player A2'].str.strip(), \
-                                 played['Player B1'].str.strip(),played['Player B2'].str.strip()]))
+    allplayers = list(pd.concat([played['A1'].str.strip(),played['A2'].str.strip(), \
+                                 played['B1'].str.strip(),played['B2'].str.strip()]))
     df_stats = pd.DataFrame(Counter(allplayers).items(),columns=['PLAYER','GP']).sort_values('PLAYER').reset_index(drop=True)
     df_stats = pd.merge(left=df_players[['PLAYER','RAT']],right=df_stats,how='outer').fillna(0)
 
     for m in range(len(played)):
         match = played.iloc[m]
   
-        A1,A2,B1,B2 = match[['Player A1','Player A2','Player B1','Player B2']].str.strip()
+        A1,A2,B1,B2 = match[['A1','A2','B1','B2']].str.strip()
         PA,PB = match[['A','B']]
         
         #print(f'A:{A},B:{B}')

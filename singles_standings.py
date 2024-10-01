@@ -9,7 +9,7 @@ sh = sa.open("SCALPEL Ladder")
 
 schedule_ws = sh.worksheet("Singles Results")
 
-schedule = get_as_dataframe(schedule_ws,nrows=90)[['Player A','Player B','1A','1B','2A','2B','3A','3B']]
+schedule = get_as_dataframe(schedule_ws,nrows=90)[['A','B','1A','1B','2A','2B','3A','3B']]
 
 played = schedule[pd.notna(schedule['1A'])]
 
@@ -25,7 +25,7 @@ for p in players:
 for m in range(len(played)):
     match = played.iloc[m]
 
-    A,B = match[['Player A','Player B']]
+    A,B = match[['A','B']]
     G1A,G1B,G2A,G2B,G3A,G3B = match[['1A','1B','2A','2B','3A','3B']]
     
     #print(f'1A:{G1A},1B:{G1B}\n2A:{G2A},2B:{G2B}\n3A:{G3A},3B:{G3B}')
@@ -67,7 +67,7 @@ for m in range(len(played)):
     dr['P'][A]=[dr['P'][A][0]+PA,dr['P'][A][1]+PB]
     dr['P'][B]=[dr['P'][B][0]+PB,dr['P'][B][1]+PA]
 
-df_stats = pd.DataFrame(Counter(pd.concat([played['Player A'],played['Player B']])).items(),columns=['Player','MP']).sort_values('Player')
+df_stats = pd.DataFrame(Counter(pd.concat([played['A'],played['B']])).items(),columns=['Player','MP']).sort_values('Player')
 
 df_stats['MW']=[dr['M'][x][0] for x in df_stats.Player]
 df_stats['ML']=[dr['M'][x][1] for x in df_stats.Player]
