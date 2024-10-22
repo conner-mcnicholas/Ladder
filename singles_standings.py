@@ -80,11 +80,11 @@ df_stats['WR']=(df_stats.W/df_stats.GP).round(4)
 
 df_stats['PF']=[dr['P'][x][0] for x in df_stats.Player]
 df_stats['PA']=[dr['P'][x][1] for x in df_stats.Player]
-df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(1)
+df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(2)
 
 
 df_stats = pd.merge(left=df_players,right=df_stats,how='outer',on="Player").fillna(0)
-df_stats = df_stats.sort_values(['MR','WR','PD\'','sRAT','dRAT'],ascending=[False,False,False,False,False])
+df_stats = df_stats.sort_values(['MR','WR','MP','PD\'','sRAT','dRAT'],ascending=[False,False,False,False,False,False])
 print(df_stats)
 df_stats['#']=range(1,1+len(df_stats))
 df_stats = df_stats[['#','Player','MP','MW','ML','MR','GP','W','L','WR','PF','PA','PD\'']]
