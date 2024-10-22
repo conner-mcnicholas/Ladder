@@ -24,7 +24,8 @@ for div in range (1,3):
     df_allevents = pd.DataFrame(columns = ["EVENT",'#','PLAYER','GP','W','L','WR','PF','PA','PD\''])
     for pe in range(1,1+events):
         played_event = played[played.Wk == pe]
-    
+        if len(played_event) == 0:
+            break
         players_ws = sh.worksheet("Players")
         df_players = get_as_dataframe(players_ws,nrows=pd.notna(get_as_dataframe(players_ws).PLAYER).sum()) \
             [['PLAYER','D','RAT','AGE','EXP','GEN']]
@@ -70,6 +71,15 @@ for div in range (1,3):
             dr['P'][A2]=[dr['P'][A2][0]+PA,dr['P'][A2][1]+PB]
             dr['P'][B2]=[dr['P'][B2][0]+PB,dr['P'][B2][1]+PA]
 
+            df_stats = df_stats[pd.notna(df_stats.PLAYER)]
+            df_stats['W']=[dr['M'][x][0] for x in df_stats.PLAYER]
+            df_stats['L']=[dr['M'][x][1] for x in df_stats.PLAYER]
+            df_stats['WR']=(df_stats.W/df_stats.GP).round(4)
+
+            df_stats['PF']=[dr['P'][x][0] for x in df_stats.PLAYER]
+            df_stats['PA']=[dr['P'][x][1] for x in df_stats.PLAYER]
+            df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(2)
+            """
             if len(played_event)==0:
                 df_stats['GP']=len(df_stats)*[0]
                 df_stats['W']=len(df_stats)*[0]
@@ -79,7 +89,6 @@ for div in range (1,3):
                 df_stats['PF']=len(df_stats)*[0]
                 df_stats['PA']=len(df_stats)*[0]
                 df_stats['PD\'']=len(df_stats)*[0.00]
-
             else:
                 df_stats = df_stats[pd.notna(df_stats.PLAYER)]
                 df_stats['W']=[dr['M'][x][0] for x in df_stats.PLAYER]
@@ -90,6 +99,7 @@ for div in range (1,3):
                 df_stats['PA']=[dr['P'][x][1] for x in df_stats.PLAYER]
                 df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(2)
 
+            """
         df_stats.sort_values(['WR','PD\''], ascending = [False,False], na_position ='last',inplace=True)
         df_stats['#'] = range(1,len(df_stats)+1)
         df_stats["EVENT"] = f"D{div}.{pe}"
@@ -123,7 +133,7 @@ for div in range (1,3):
     df_topthree['#'] = range(1,len(df_topthree)+1)
     df_topthree = df_topthree[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
     leader_ws = sh.worksheet(f"Leaderboard")
-    set_with_dataframe(leader_ws, df_topthree, row=2, col=2+((div-1)*10))      
+    set_with_dataframe(leader_ws, df_topthree, row=3, col=2+((div-1)*10))      
     top_dict[div] = df_topthree
 
     df_diff = pd.concat([df_topall['PLAYER'],df_topall.sort_values('PLAYER')[['GP','W','L','WR','PF','PA','PD\'']] - df_topthree.sort_values('PLAYER')[['GP','W','L','WR','PF','PA','PD\'']]],axis=1)
