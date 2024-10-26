@@ -58,7 +58,7 @@ for div in range (1,3):
                 dr['M'][A2][0]+=1
                 dr['M'][B2][1]+=1
             else:
-                #print(f'{B} beat {A}by score:{PB}-{PA}')
+                #print(f'{B} beat {A} by score:{PB}-{PA}')
                 dr['M'][A1][1]+=1
                 dr['M'][B1][0]+=1
 
@@ -79,44 +79,39 @@ for div in range (1,3):
             df_stats['PF']=[dr['P'][x][0] for x in df_stats.PLAYER]
             df_stats['PA']=[dr['P'][x][1] for x in df_stats.PLAYER]
             df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(2)
-            """
-            if len(played_event)==0:
-                df_stats['GP']=len(df_stats)*[0]
-                df_stats['W']=len(df_stats)*[0]
-                df_stats['L']=len(df_stats)*[0]
-                df_stats['WR']=len(df_stats)*[0.0]
-
-                df_stats['PF']=len(df_stats)*[0]
-                df_stats['PA']=len(df_stats)*[0]
-                df_stats['PD\'']=len(df_stats)*[0.00]
-            else:
-                df_stats = df_stats[pd.notna(df_stats.PLAYER)]
-                df_stats['W']=[dr['M'][x][0] for x in df_stats.PLAYER]
-                df_stats['L']=[dr['M'][x][1] for x in df_stats.PLAYER]
-                df_stats['WR']=(df_stats.W/df_stats.GP).round(4)
-
-                df_stats['PF']=[dr['P'][x][0] for x in df_stats.PLAYER]
-                df_stats['PA']=[dr['P'][x][1] for x in df_stats.PLAYER]
-                df_stats['PD\'']=((df_stats.PF-df_stats.PA)/df_stats.GP).round(2)
-
-            """
+         
         df_stats.sort_values(['WR','PD\''], ascending = [False,False], na_position ='last',inplace=True)
         df_stats['#'] = range(1,len(df_stats)+1)
         df_stats["EVENT"] = f"D{div}.{pe}"
         df_stats = df_stats[['EVENT','#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
         df_stats = df_stats[df_stats.GP != 0]
-        #print(df_stats.reset_index(drop=True))
 
         stats_ws = sh.worksheet(f"Week {pe} Stats")
         set_with_dataframe(stats_ws, df_stats[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']], row=2, col=2+((div-1)*10))
         df_allevents = pd.concat([df_allevents,df_stats])
 
-    if div == 1:
-        df_allevents = df_allevents[df_allevents.PLAYER !='Colin Pollock']
-    if div == 2:
-        df_allevents = df_allevents[df_allevents !='Mauricio Cuervo']
-        df_allevents = df_allevents[df_allevents !='Alessandro Arnulfo']
+    subs = {1:['Colin Pollock','Shawnte Hagen','Ben Dreyer','Oscar Hernandez', \
+               'Dave Cox','Jay Spencer','Josh Bostock','Christine Jandreau'], \
+                2:['Mauricio Cuervo','Alessandro Arnulfo','Mike O\'Brien']}
+    for s in subs[div]: 
+        df_allevents = df_allevents[df_allevents.PLAYER !=s]
 
+    df_topthree = df_allevents.sort_values(["PLAYER","WR","PD'"],ascending=[True,False,False]).groupby('PLAYER').head(3).groupby('PLAYER')[['GP','W','L','PF','PA']].sum().reset_index()
+    df_topthree["WR"] = df_topthree.W/df_topthree.GP
+    df_topthree["PD'"] = (df_topthree.PF-df_topthree.PA)/df_topthree.GP
+    df_topthree.sort_values(['WR','GP','PD\''], ascending = [False,False,False], na_position ='last',inplace=True)
+    df_topthree['#'] = range(1,len(df_topthree)+1)
+    df_topthree = df_topthree[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
+
+    leader_ws = sh.worksheet(f"Leaderboard")
+    set_with_dataframe(leader_ws, df_topthree, row=3, col=2+((div-1)*10))
+
+    #PRINTING COMPARISONS AFTER DROPPING LOWEST EVENTS FOR THOSE W/ > 3    
+    
+    top_dict[div] = df_topthree
+    print("{:-^65s}".format(f" D{div} TOP THREE "))
+    print(f"{df_topthree.head(len(df_topthree))}\n{65*'-'}")
+    
     df_topall = df_allevents.groupby('PLAYER')[['GP','W','L','PF','PA']].sum().reset_index()
     df_topall["WR"] = df_topall.W/df_topall.GP
     df_topall["PD'"] = (df_topall.PF-df_topall.PA)/df_topall.GP
@@ -124,20 +119,13 @@ for div in range (1,3):
     df_topall['#'] = range(1,len(df_topall)+1)
     df_topall = df_topall[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
     all_dict[div] = df_topall
+    print("{:-^65s}".format(f" D{div} ALL "))
+    print(f"{df_topall.head(len(df_topall))}\n{65*'-'}")
 
-    df_topthree = df_allevents.sort_values(["PLAYER","WR","PD'"],ascending=[True,False,False]). \
-          groupby('PLAYER').head(3).groupby('PLAYER')[['GP','W','L','PF','PA']].sum().reset_index()
-    df_topthree["WR"] = df_topthree.W/df_topthree.GP
-    df_topthree["PD'"] = (df_topthree.PF-df_topthree.PA)/df_topthree.GP
-    df_topthree.sort_values(['WR','GP','PD\''], ascending = [False,False,False], na_position ='last',inplace=True)
-    df_topthree['#'] = range(1,len(df_topthree)+1)
-    df_topthree = df_topthree[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
-    leader_ws = sh.worksheet(f"Leaderboard")
-    set_with_dataframe(leader_ws, df_topthree, row=3, col=2+((div-1)*10))      
-    top_dict[div] = df_topthree
-
-    df_diff = pd.concat([df_topall['PLAYER'],df_topall.sort_values('PLAYER')[['GP','W','L','WR','PF','PA','PD\'']] - df_topthree.sort_values('PLAYER')[['GP','W','L','WR','PF','PA','PD\'']]],axis=1)
-    diff_dict[div] = df_diff[df_diff.GP != 0]
-    print("\n\n")
-    print(diff_dict[div])
-    print("\n\n")
+    df_diff = pd.concat([df_topall['PLAYER'], \
+                         df_topthree.sort_values('PLAYER')[['#','GP','W','L','WR','PF','PA','PD\'']] -  \
+                         df_topall.sort_values('PLAYER')[['#','GP','W','L','WR','PF','PA','PD\'']]],axis=1)
+    df_diff = df_diff[df_diff.GP != 0].reset_index(drop=True)
+    diff_dict[div] =  df_diff 
+    print("{:-^65s}".format(f" D{div} DIFFERENCE "))
+    print(f"{df_diff.head(len(df_diff))}\n{65*'-'}")

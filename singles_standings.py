@@ -91,4 +91,4 @@ df_stats = df_stats[['#','Player','MP','MW','ML','MR','GP','W','L','WR','PF','PA
 print(df_stats.reset_index(drop=True).to_string())
 
 standings_ws = sh.worksheet("Leaderboard")
-set_with_dataframe(standings_ws, df_stats, row=2, col=22)
+set_with_dataframe(standings_ws, df_stats, row=3, col=22)
