@@ -5,12 +5,20 @@ from collections import Counter
 import datetime
 import numpy as np
 
+pd.set_option('display.max_rows', None)
+pd.set_option('display.precision', 4)
+
+
 sa = gspread.service_account()
-sh = sa.open("SCALPEL Ladder")
+sh = sa.open("Raw SCALPEL Ladder")
+
+top_dict = {}
+all_dict = {}
+diff_dict = {}
 
 for div in range (1,3):
     schedule_ws = sh.worksheet(f"D{div} Results")
-    schedule = get_as_dataframe(schedule_ws,nrows=100)[['Wk','A1', \
+    schedule = get_as_dataframe(schedule_ws)[['Wk','A1', \
         'A2','B1','B2','A','B']]
     played = schedule[pd.notna(schedule['A'])]
     if len(played) == 0:
@@ -82,5 +90,17 @@ for div in range (1,3):
         df_stats = df_stats[['EVENT','#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
         df_stats = df_stats[df_stats.GP != 0]
 
-        stats_ws = sh.worksheet(f"Week {pe} Stats")
-        set_with_dataframe(stats_ws, df_stats[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']], row=2, col=2+((div-1)*10))
+        df_allevents = pd.concat([df_allevents,df_stats])
+
+    df_topall = df_allevents.groupby('PLAYER')[['GP','W','L','PF','PA']].sum().reset_index()
+    df_topall["WR"] = df_topall.W/df_topall.GP
+    df_topall["PD'"] = (df_topall.PF-df_topall.PA)/df_topall.GP
+    df_topall.sort_values(['WR','GP','PD\''], ascending = [False,False,False], na_position ='last',inplace=True)
+    df_topall['#'] = range(1,len(df_topall)+1)
+    df_topall = df_topall[['#','PLAYER','GP','W','L','WR','PF','PA','PD\'']]
+    all_dict[div] = df_topall
+    print("{:-^65s}".format(f" D{div} ALL "))
+    print(f"{df_topall}\n{65*'-'}")
+
+    leader_ws = sh.worksheet(f"Leaderboard")
+    set_with_dataframe(leader_ws, df_topall, row=3, col=2+((div-1)*10))

@@ -15,7 +15,7 @@ diff_dict = {}
 
 # Loop over divisions
 for div in range(1, 2):
-    schedule_ws = sh.worksheet(f"D{div} Results")
+    schedule_ws = sh.worksheet(f"D{div} Res")
     schedule = get_as_dataframe(schedule_ws, nrows=100)[['Wk', 'A1', 'A2', 'B1', 'B2', 'A', 'B']]
     played = schedule[pd.notna(schedule['A'])]
     if len(played) == 0:
@@ -98,5 +98,10 @@ for div in range(1, 2):
 
     diff_df.reset_index(drop=False,names="player",inplace=True)
     # Save the DataFrame to a new worksheet in Google Sheets if required
+    part_ws = sh.worksheet(f"D{div}_Partner")
+    set_with_dataframe(part_ws,pd.DataFrame(partnership_diff), row=1, col=1)
+    opp_ws = sh.worksheet(f"D{div}_Oppose")
+    set_with_dataframe(opp_ws,pd.DataFrame(opposition_diff), row=1, col=1)
+
     diff_ws = sh.worksheet(f"D{div} Point Differential")
     set_with_dataframe(diff_ws, diff_df, row=1, col=1)
