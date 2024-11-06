@@ -31,7 +31,21 @@ for m in range(len(played)):
     #print(f'1A:{G1A},1B:{G1B}\n2A:{G2A},2B:{G2B}\n3A:{G3A},3B:{G3B}')
     PA = pd.Series([G1A,G2A,G3A]).sum().astype(int)
     PB = pd.Series([G1B,G2B,G3B]).sum().astype(int)
-    if pd.isna(G3A):
+    if pd.isna(G2A):
+        #print('settled in 2 games')
+        if G1A > G1B:
+            #print(f'{A} beat {B} 2 games to 0')
+            dr['M'][A][0]+=1
+            dr['M'][B][1]+=1
+            dr['G'][A][0]+=1
+            dr['G'][B][1]+=1
+        else:
+            #print(f'{B} beat {A} 2 games to 0')
+            dr['M'][A][1]+=1
+            dr['M'][B][0]+=1
+            dr['G'][A][1]+=1
+            dr['G'][B][0]+=1
+    elif pd.isna(G3A):
         #print('settled in 2 games')
         if G2A > G2B:
             #print(f'{A} beat {B} 2 games to 0')
