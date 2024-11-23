@@ -14,9 +14,9 @@ all_dict = {}
 diff_dict = {}
 
 # Loop over divisions
-for div in range(1, 2):
+for div in [1,2]:
     schedule_ws = sh.worksheet(f"D{div} Res")
-    schedule = get_as_dataframe(schedule_ws, nrows=100)[['Wk', 'A1', 'A2', 'B1', 'B2', 'A', 'B']]
+    schedule = get_as_dataframe(schedule_ws)[['Wk', 'A1', 'A2', 'B1', 'B2', 'A', 'B']]
     played = schedule[pd.notna(schedule['A'])]
     if len(played) == 0:
         break

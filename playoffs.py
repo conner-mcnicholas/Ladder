@@ -17,7 +17,7 @@ all_dict = {}
 diff_dict = {}
 
 for div in [1,2]:
-    schedule_ws = sh.worksheet(f"D{div} Results")
+    schedule_ws = sh.worksheet(f"D{div} Results"):
     schedule = get_as_dataframe(schedule_ws)[['Wk','A1', \
         'A2','B1','B2','A','B']]
     played = schedule[pd.notna(schedule['A'])]
@@ -26,7 +26,7 @@ for div in [1,2]:
     events = int(np.max(played.Wk))
 
     df_allevents = pd.DataFrame(columns = ["EVENT",'#','PLAYER','GP','W','L','WR','PF','PA','PD\''])
-    for pe in range(1,9):
+    for pe in range(1,1+events):
         played_event = played[played.Wk == pe]
         if len(played_event) == 0:
             break
