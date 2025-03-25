@@ -10,7 +10,7 @@ pd.set_option('display.precision', 4)
 
 
 sa = gspread.service_account()
-sh = sa.open("SCALPEL Ladder")
+sh = sa.open("SCALPEL 4")
 
 top_dict = {}
 all_dict = {}
@@ -26,7 +26,7 @@ for div in [1,2]:
     events = int(np.max(played.Wk))
 
     df_allevents = pd.DataFrame(columns = ["EVENT",'#','PLAYER','GP','W','L','WR','PF','PA','PD\''])
-    for pe in range(1,9):
+    for pe in range(1,played.Wk.max()+1):
         played_event = played[played.Wk == pe]
         if len(played_event) == 0:
             break
@@ -92,8 +92,7 @@ for div in [1,2]:
 
         df_allevents = pd.concat([df_allevents,df_stats])
 
-    subs = {1:['Colin Pollock','Shawnte Hagen','Ben Dreyer','Oscar Hernandez', \
-               'Dave Cox','Jay Spencer','Josh Bostock','Christine Jandreau','George Propper','John Funkey'], \
+    subs = {1:['Alex Rinkert','Mark Dickerson'], \
                 2:['Mauricio Cuervo','Alex Rinkert','Alessandro Arnulfo','Mike O\'Brien']}
     for s in subs[div]: 
         df_allevents = df_allevents[df_allevents.PLAYER !=s]
